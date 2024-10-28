@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moja Aplikacja Czatowa</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        header {
+            background: #0078d7;
+            color: #fff;
+            padding: 10px 20px;
+            text-align: center;
+        }
+
+        .czat-window {
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 300px;
+            overflow-y: scroll;
+            background-color: white;
+        }
+
+        .wiadomosc {
+            margin: 5px 0;
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 70%;
+            padding: 10px;
+            margin: 10px 0;
+        }
+
+        button {
+            padding: 10px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            background: #0078d7;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Moja Aplikacja Czatowa</h1>
+    </header>
+
+    <main>
+        <section id="rejestracja">
+            <h2>Rejestracja</h2>
+            <input type="text" id="rejestracjaImie" placeholder="Twoje imię" />
+            <input type="password" id="rejestracjaHaslo" placeholder="Hasło" />
+            <button onclick="zarejestruj()">Zarejestruj</button>
+        </section>
+
+        <section id="czaty" style="display: none;">
+            <h2>Czaty</h2>
+            <div class="czat-window" id="czatWindow">
+                <div class="wiadomosc">Witaj w czacie!</div>
+            </div>
+            <input type="text" id="wiadomoscInput" placeholder="Napisz wiadomość..." />
+            <button onclick="wyslijWiadomosc()">Wyślij</button>
+            <h3>Kontakty</h3>
+            <input type="text" id="kontaktInput" placeholder="Dodaj kontakt..." />
+            <button onclick="dodajKontakt()">Dodaj Kontakt</button>
+            <ul id="listaKontakty"></ul>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Moja Aplikacja Czatowa</p>
+    </footer>
+
+    <script>
+        let imie = '';
+        const kontakty = JSON.parse(localStorage.getItem('kontakty')) || [];
+
+        function zarejestruj() {
+            const imieInput = document.getElementById('rejestracjaImie').value;
+            const hasloInput = document.getElementById('rejestracjaHaslo').value;
+
+            if (imieInput && hasloInput) {
+                imie = imieInput;
+                localStorage.setItem('user', JSON.stringify({ imie, haslo: hasloInput }));
+                document.getElementById('rejestracja').style.display = 'none';
+                document.getElementById('czaty').style.display = 'block';
+                document.getElementById('czatWindow').innerHTML += `<div class="wiadomosc">Witaj, ${imie}!</div>`;
+                wyswietlKontakty();
+            } else {
+                alert('Proszę wprowadzić imię i hasło.');
+            }
+        }
+
+        function wyslijWiadomosc() {
+            const wiadomoscInput = document.getElementById('wiadomoscInput');
+            const wiadomosc = wiadomoscInput.value;
+
+            if (wiadomosc) {
+                const czatWindow = document.getElementById('czatWindow');
+                const div = document.createElement('div');
+                div.className = 'wiadomosc';
+                div.textContent = `${imie}: ${wiadomosc}`;
+                czatWindow.appendChild(div);
+                wiadomoscInput.value = '';
+                czatWindow.scrollTop = czatWindow.scrollHeight; // Przewija do dołu
+            }
+        }
+
+        function dodajKontakt() {
+            const kontaktInput = document.getElementById('kontaktInput');
+            const kontakt = kontaktInput.value;
+
+            if (kontakt && !kontakty.includes(kontakt)) {
+                kontakty.push(kontakt);
+                localStorage.setItem('kontakty', JSON.stringify(kontakty));
+                kontaktInput.value = '';
+                wyswietlKontakty();
+            } else {
+                alert('Podany kontakt jest już na liście lub pole jest puste.');
+            }
+        }
+
+        function wyswietlKontakty() {
+            const listaKontakty = document.getElementById('listaKontakty');
+            listaKontakty.innerHTML = '';
+
+            kontakty.forEach(kontakt => {
+                const li = document.createElement('li');
+                li.textContent = kontakt;
+                listaKontakty.appendChild(li);
+            });
+        }
+    </script>
+</body>
+</html>
